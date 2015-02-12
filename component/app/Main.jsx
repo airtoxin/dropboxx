@@ -1,11 +1,11 @@
 var React = require( 'react' );
+var Connect = require( './main/Connect.jsx' );
 
 var Main = React.createClass( {
 	displayName: 'Main',
 	getInitialState: function () {
 		return {
-			peerId: '',
-			otherId: '',
+			myId: '',
 			isConnected: false
 		};
 	},
@@ -14,7 +14,7 @@ var Main = React.createClass( {
 		this.peer = new window.Peer( { key: '6rxcn8ohlknpnwmi' } );
 		this.peer.on( 'open', function ( id ) {
 			self.setState( {
-				peerId: id
+				myId: id
 			} );
 		} );
 		this.peer.on( 'connection', function ( conn ) {
@@ -24,38 +24,28 @@ var Main = React.createClass( {
 	},
 	render: function() {
 		return (
-			<div>
-				<h1>My ID is: { this.state.peerId }</h1>
-				{ this.state.isConnected ? <h2>Other ID is: { this.state.otherId }</h2> : null }
-				{ this.state.isConnected ? null : <input type="text" value={ this.state.otherId } onChange={ this._onChange }/> }
-				{ this.state.isConnected ? null : <button onClick={ this._onClick }>Connect</button> }
+			<div className="component-main">
+				<h1>My ID is: { this.state.myId }</h1>
+				<Connect isConnected={ this.state.isConnected } onPushConnect={ this._onPushConnect } />
 			</div>
 		);
 	},
-	_onChange: function ( event ) {
-		this.setState( {
-			otherId: event.target.value
-		} );
-	},
-	_onClick: function () {
-		var conn = this.peer.connect( this.state.otherId );
-		if ( !this.conn ) this.conn = conn;
+	_onPushConnect: function ( otherId ) {
+		this.conn = this.peer.connect( otherId );
 		this.conn.on( 'open', this._onOpen );
 	},
 	_onOpen: function () {
 		var self = this;
 		this.setState( {
-			isConnected: true,
-			otherId: this.conn.peer
+			isConnected: true
 		} );
-		console.log("@@@open@@@");
-		self.conn.on( 'data', function ( data ) {
+		this.conn.on( 'data', function ( data ) {
 			console.log("@Received:", data);
 		} );
 
 		setInterval( function () {
 			self.conn.send( 'Hello!' );
-		}, 1000 );
+		}, Math.random() * 1000 );
 	}
 } );
 
