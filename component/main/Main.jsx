@@ -5,7 +5,8 @@ var Main = React.createClass( {
 	getInitialState: function () {
 		return {
 			peerId: '',
-			otherId: ''
+			otherId: '',
+			isConnected: false
 		};
 	},
 	componentDidMount: function () {
@@ -25,8 +26,9 @@ var Main = React.createClass( {
 		return (
 			<div>
 				<h1>My ID is: { this.state.peerId }</h1>
-				<input type="text" value={ this.state.otherId } onChange={ this._onChange }/>
-				<button onClick={ this._onClick }>Connect</button>
+				{ this.state.isConnected ? <h2>Other ID is: { this.state.otherId }</h2> : null }
+				{ this.state.isConnected ? null : <input type="text" value={ this.state.otherId } onChange={ this._onChange }/> }
+				{ this.state.isConnected ? null : <button onClick={ this._onClick }>Connect</button> }
 			</div>
 		);
 	},
@@ -42,6 +44,10 @@ var Main = React.createClass( {
 	},
 	_onOpen: function () {
 		var self = this;
+		this.setState( {
+			isConnected: true,
+			otherId: this.conn.peer
+		} );
 		console.log("@@@open@@@");
 		self.conn.on( 'data', function ( data ) {
 			console.log("@Received:", data);
