@@ -1,12 +1,15 @@
 var React = require( 'react' );
 var Connect = require( './main/Connect.jsx' );
+var FileForm = require( './main/FileForm.jsx' );
 
 var Main = React.createClass( {
 	displayName: 'Main',
 	getInitialState: function () {
 		return {
 			myId: '',
-			isConnected: false
+			isConnected: false,
+			url: '',
+			name: ''
 		};
 	},
 	componentDidMount: function () {
@@ -27,6 +30,8 @@ var Main = React.createClass( {
 			<div className="component-main">
 				<h1>My ID is: { this.state.myId }</h1>
 				<Connect isConnected={ this.state.isConnected } onPushConnect={ this._onPushConnect } />
+				<FileForm ref="file" />
+				<a href={ this.state.url } download={ this.state.name }>wefwef</a>
 			</div>
 		);
 	},
@@ -40,12 +45,17 @@ var Main = React.createClass( {
 			isConnected: true
 		} );
 		this.conn.on( 'data', function ( data ) {
-			console.log("@Received:", data);
+			console.log("@data:", data);
+			var blob = new Blob( [ data.arrayBuffer ], {
+				type: data.type
+			} );
+			self.setState( {
+				url: URL.createObjectURL( blob ),
+				name: data.name
+			} );
 		} );
 
-		setInterval( function () {
-			self.conn.send( 'Hello!' );
-		}, Math.random() * 1000 );
+		this.conn.send( this.refs.file.getFile() );
 	}
 } );
 
