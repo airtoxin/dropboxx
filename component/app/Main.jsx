@@ -9,7 +9,8 @@ var Main = React.createClass( {
 			myId: '',
 			isConnected: false,
 			url: '',
-			name: ''
+			name: '',
+			otherId: ''
 		};
 	},
 	componentDidMount: function () {
@@ -29,20 +30,32 @@ var Main = React.createClass( {
 		return (
 			<div className="component-main">
 				<h1>My ID is: { this.state.myId }</h1>
-				<Connect isConnected={ this.state.isConnected } onPushConnect={ this._onPushConnect } />
+				<Connect
+					isConnected={ this.state.isConnected }
+					onPushConnect={ this._onPushConnect }
+					otherId={ this.state.otherId }
+				/>
 				<FileForm ref="file" />
 				<a href={ this.state.url } download={ this.state.name }>wefwef</a>
 			</div>
 		);
 	},
 	_onPushConnect: function ( otherId ) {
+		var self = this;
+
 		this.conn = this.peer.connect( otherId );
-		this.conn.on( 'open', this._onOpen );
+		this.conn.on( 'open', function () {
+			self.setState( {
+				otherId: otherId
+			} );
+			self._onOpen();
+		} );
 	},
 	_onOpen: function () {
 		var self = this;
 		this.setState( {
-			isConnected: true
+			isConnected: true,
+			otherId: this.conn.peer
 		} );
 		this.conn.on( 'data', function ( data ) {
 			console.log("@data:", data);
