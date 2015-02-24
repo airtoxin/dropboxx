@@ -36,7 +36,7 @@ var Main = React.createClass( {
 					otherId={ this.state.otherId }
 				/>
 				<FileForm ref="file" />
-				<a href={ this.state.url } download={ this.state.name }>wefwef</a>
+				<a href={ this.state.url } download={ this.state.name }>Download</a>
 			</div>
 		);
 	},
